@@ -28,3 +28,4 @@ jobs:
         with:
           push: true
           tags: biled23/healthy-food-shop:latest
+          context: ./HealthyFoodShop
