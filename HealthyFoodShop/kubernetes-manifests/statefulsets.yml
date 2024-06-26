@@ -16,12 +16,6 @@ data:
   POSTGRES_USER: YmQ=
   POSTGRES_PASSWORD: YmlsZWQ=
 ---
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: local-path
-provisioner: rancher.io/local-path
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -75,7 +69,7 @@ spec:
           env:
             - name: POSTGRES_DB
               valueFrom:
-                secretKeyRef:
+                configMapKeyRef:
                   name: db-config
                   key: POSTGRES_DB
             - name: POSTGRES_USER
@@ -90,7 +84,7 @@ spec:
                   key: POSTGRES_PASSWORD
           volumeMounts:
             - name: postgres-storage
-              mountPath: .:/postgres-data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
