@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: healthyfood-app
+data:
+  POSTGRES_DB: "healthyfood"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+  namespace: healthyfood-app
+type: Opaque
+data:
+  POSTGRES_USER: YmQ=
+  POSTGRES_PASSWORD: YmlsZWQ=
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+provisioner: rancher.io/local-path
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: db-pvc
+  namespace: healthyfood-app
+  labels:
+    app: postgres
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: healthyfood-app
+spec:
+  ports:
+    - port: 5432
+      name: postgres
+      protocol: TCP
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: healthyfood-app
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: .:/postgres-data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: db-pvc

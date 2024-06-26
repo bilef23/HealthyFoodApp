@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configmap
+  namespace: healthyfood-app
+data:
+  POSTGRES_URL: "db-service.healthyfood-app.svc.cluster.local"
+  POSTGRES_HOST: "db"
+  POSTGRES_DB: "healthyfood"
