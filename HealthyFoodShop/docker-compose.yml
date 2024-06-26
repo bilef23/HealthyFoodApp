@@ -14,10 +14,15 @@ services:
   web:
     container_name: "django-app"
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
       DATABASE_URL: ${DATABASE_URL}
+    entrypoint: >
+      bash -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
