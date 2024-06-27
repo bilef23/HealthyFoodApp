@@ -14,6 +14,7 @@ COPY requirements.txt /code/
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
+COPY img /code/img
 COPY .. /code/
 
 EXPOSE 8000
