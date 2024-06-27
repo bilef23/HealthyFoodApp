@@ -34,4 +34,4 @@ jobs:
       - name: Deploy to deployment environment
         if: success()
         run: |
-          docker run -d -p 8000:8000 stefanvasilev2002/projects-kiii-image:latest
+          docker run -d -p 8000:8000 biled23/healthy-food-shop:latest
