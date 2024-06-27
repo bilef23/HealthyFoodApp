@@ -19,4 +19,4 @@ RUN python manage.py makemigrations
 RUN python manage.py migrate
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "Projects.wsgi:application"]
+CMD ["bash", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
